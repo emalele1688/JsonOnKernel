@@ -36,8 +36,14 @@
 #define KJSON_MEMORY_DUMP_SIZE 4096
 #endif
 
+/*
+ * This is the kjson data structure.
+ */
 struct kjson_container;
 
+/*
+ * JSON value type supported.
+ */
 enum kjson_object_type {
     KOBJECT_TYPE_INTEGER        = 1,
     KOBJECT_TYPE_STRING         = 2,
@@ -48,6 +54,12 @@ enum kjson_object_type {
     KOBJECT_NUM                 = 7
 };
 
+/*
+ * kjson_object_t rappresent a JSON object into a JSON data structure.
+ * Each kjson_object_t is a node of an Hash Table defined into the kjson_container.
+ * Key is the JSON key, used to access the Hash Table.
+ * data is a variable array that store the JSON value type (int, string, array, ecc).
+ */
 struct kjson_object_t {
     struct hlist_node obj_list;
     enum kjson_object_type type;
@@ -55,21 +67,27 @@ struct kjson_object_t {
     char data[];
 };
 
+/*
+ * If data is an array, it's header is defined by this struct
+ */
 struct kjson_array_struct {
     size_t len;
     char data[];
 };
 
+/*
+ * Alloc and Dealloc a kjson_object_t
+ */
 #define kj_alloc(obj, data_len) (obj = kzalloc(sizeof(struct kjson_object_t) + data_len, GFP_KERNEL))
 #define kj_dealloc(obj) kfree(obj)
 
 /*
- * Creates a new JSON container
+ * Creates a new JSON container.
  */
 extern struct kjson_container *kjson_new_container(void);
 
 /*
- * Dealloc a JSON container with all sub container
+ * Dealloc a JSON container with all sub container.
  */
 extern void kjson_delete_container(struct kjson_container *ctn);
 
@@ -84,26 +102,26 @@ extern struct kjson_object_t *kjson_lookup_object(struct kjson_container *ctn, c
 extern void kjson_pop_object(struct kjson_container *ctn, const char *key);
 
 /*
- * Insert an object with the specific key on the ctn container
- * Used by the utility insert functions below
+ * Insert an object with the specific key on the ctn container.
+ * Used by the utility insert functions below.
  */
 extern int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_object_type type, void *data, size_t data_len);
 
 /*
- * Will push a kjson_object_t type
- * Used by kjson_parser engine
+ * Will push a kjson_object_t type.
+ * Used by kjson parser engine.
  */
 extern int __kjson_push_object(struct kjson_container *ctn, struct kjson_object_t *obj);
 
 /*
- * Remove an object using the kjson_object_t
+ * Remove an object using the kjson_object_t.
  */
 extern void kjson_delete_object(struct kjson_object_t *obj);
 
 /* ****** utility insert functions ****** */
 
 /*
- * Insert an integer
+ * Insert an integer.
  * Example: kjson_push_integer(ctn, "MyKeyForInteger", 1);
  */
 #define kjson_push_integer(ctn, key, T) do {                        \
@@ -112,7 +130,7 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 } while(0)
 
 /*
- * Insert a string
+ * Insert a string.
  * Example: kjson_push_string(ctn, "MyKeyForString", "MyString");
  */
 #define kjson_push_string(ctn, key, T) do {                         \
@@ -120,7 +138,7 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 } while(0)
 
 /*
- * Insert an annidated json. child_ctn will be a child of ctn.
+ * Insert an annidated JSON. child_ctn will be a child of ctn.
  * child_ctn shall be a type of kjson_container.
  * In case of you'll call kjson_delete_container on ctn, child_ctn will be deleted too.
  */
@@ -129,7 +147,7 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 } while(0)
 
 /*
- * Insert an array of integers
+ * Insert an array of integers.
  * Example: kjson_push_integer_array(ctn, "MyKeyForArrayInt", 1, 2, 3, 5);
  */
 #define kjson_push_integer_array(ctn, key, ... ) do {                                              \
@@ -138,7 +156,7 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 } while(0)
 
 /*
- * Insert an array of strings
+ * Insert an array of strings.
  * Example: kjson_push_string_array(ctn, "MyKeyForArrayChar", "str1", "str2", "str3", "str5");
  */
 #define kjson_push_string_array(ctn, key, ... ) do {                                            \
@@ -147,9 +165,9 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 } while(0)
 
 /*
- * Insert an annidated json array. All kjson_container objects inserts will be childs of ctn.
+ * Insert an annidated JSON array. All kjson_container objects inserts will be childs of ctn.
  * Example: kjson_push_container_array(ctn, "AKeyOf", child1, child2, child3, child4);
- * Where child-n are kjson_container types
+ * Where child-n are kjson_container types.
  * In case of you'll call kjson_delete_container on ctn, all child-n will be deleted too.
  */
 #define kjson_push_container_array(ctn, key, ... ) do {                                                             \
@@ -160,18 +178,18 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 /* ****** utility read functions ****** */
 
 /*
- * Converts a kjson_object_t to an integer
+ * Converts a kjson_object_t to an integer.
  */
 #define kjson_as_integer(obj) *((int64_t*)obj->data)
 
 /*
- * Converts a kjson_object_t to a string
+ * Converts a kjson_object_t to a string.
  */
 #define kjson_as_string(obj) (char*)obj->data
 
 /*
  * Converts a kjson_object_t to a container.
- * kjson_container returned is a child (Do not deallocated it)
+ * kjson_container returned is a child (Do not deallocated it).
  */
 #define kjson_as_container(obj) *((struct kjson_container**)obj->data)
 
@@ -187,17 +205,17 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 
 /*
  * Converts a kjson_object_t to an array of containers.
- * kjson_containers returned are childs (Do not deallocated it)
+ * kjson_containers returned are childs (Do not deallocated it).
  */
 #define kjson_as_container_array(obj) (struct kjson_container**)((struct kjson_array_struct*)obj->data)->data
 
 /*
- * Get the lenght of an array
+ * Get the lenght of an array.
  */
 #define kjson_array_length(obj) (size_t)((struct kjson_array_struct*)obj->data)->len
 
 /*
- * Parse a JSON text and creates the KJSON data strucure
+ * Create a JSON text starting from the internal data structure.
  */
 extern struct kjstring_t *kjson_dump(struct kjson_container *ctn);
 
