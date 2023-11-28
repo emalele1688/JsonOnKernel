@@ -23,7 +23,6 @@
 #include <linux/kstrtox.h>
 
 #include "kjson.h"
-#include "kjson_parser.h"
 
 #define pop_nospace(iterator, chr) do {         \
     do {                                        \

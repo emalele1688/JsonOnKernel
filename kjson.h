@@ -219,5 +219,10 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
  */
 extern struct kjstring_t *kjson_dump(struct kjson_container *ctn);
 
+/*
+ * Parse a JSON text and create the kjson_container object
+ */
+extern struct kjson_container *kjson_parse(const struct kjstring_t *json_str);
+
 
 #endif

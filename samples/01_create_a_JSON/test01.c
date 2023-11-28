@@ -3,7 +3,6 @@
 
 #include <linux/module.h>
 #include "../../kjson.h"
-#include "../../kjson_parser.h"
 
 int __init test_init(void)
 {
