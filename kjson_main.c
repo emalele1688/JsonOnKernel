@@ -20,6 +20,7 @@
  * Authors: Emanuele Santini <emanuele.santini.88@gmail.com>
 */
 
+#include <linux/module.h>
 #include <linux/vmalloc.h>
 #include <linux/slab.h>
 #include <linux/hashtable.h>
@@ -75,6 +76,7 @@ struct kjson_container *kjson_new_container(void)
 
     return ctn;
 }
+EXPORT_SYMBOL_GPL(kjson_new_container);
 
 void kjson_delete_container(struct kjson_container *ctn)
 {
@@ -92,6 +94,7 @@ void kjson_delete_container(struct kjson_container *ctn)
 
     kfree(ctn);
 }
+EXPORT_SYMBOL_GPL(kjson_delete_container);
 
 void kjson_delete_object(struct kjson_object_t *obj)
 {
@@ -116,6 +119,7 @@ void kjson_delete_object(struct kjson_object_t *obj)
 
     kj_dealloc(obj);
 }
+EXPORT_SYMBOL(kjson_delete_object);
 
 void dealloc_string_array(struct kjson_object_t *obj)
 {
@@ -162,6 +166,7 @@ struct kjson_object_t *kjson_lookup_object(struct kjson_container *ctn, const ch
 
     return obj;
 }
+EXPORT_SYMBOL_GPL(kjson_lookup_object);
 
 void kjson_pop_object(struct kjson_container *ctn, const char *key)
 {
@@ -175,6 +180,7 @@ void kjson_pop_object(struct kjson_container *ctn, const char *key)
 
     kjson_delete_object(obj);
 }
+EXPORT_SYMBOL(kjson_pop_object);
 
 int __kjson_push_object(struct kjson_container *ctn, struct kjson_object_t *obj)
 {
@@ -199,6 +205,7 @@ int __kjson_push_object(struct kjson_container *ctn, struct kjson_object_t *obj)
 
     return 0;
 }
+EXPORT_SYMBOL_GPL(__kjson_push_object);
 
 void copy_string_array(struct kjson_object_t *obj, char **str_array, size_t array_len)
 {
@@ -340,6 +347,7 @@ int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_o
 
     return 0;
 }
+EXPORT_SYMBOL_GPL(kjson_push_object);
 
 #define open_scoope(json_dmp)       kjstring_append(json_dmp, "{")
 #define close_scoope(json_dmp)      kjstring_append(json_dmp, "}")
@@ -491,5 +499,8 @@ struct kjstring_t *kjson_dump(struct kjson_container *ctn)
 
     return json_dmp;
 }
+EXPORT_SYMBOL_GPL(kjson_dump);
+
+MODULE_LICENSE("GPL");
 
 

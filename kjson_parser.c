@@ -20,6 +20,7 @@
  * Authors: Emanuele Santini <emanuele.santini.88@gmail.com>
 */
 
+#include <linux/module.h>
 #include <linux/kstrtox.h>
 
 #include "kjson.h"
@@ -611,4 +612,7 @@ struct kjson_container *kjson_parse(const struct kjstring_t *json_str)
 
     return kjson_start_parser(&iterator, false);
 }
+EXPORT_SYMBOL_GPL(kjson_parse);
+
+MODULE_LICENSE("GPL");
 
