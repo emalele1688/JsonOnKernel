@@ -19,7 +19,7 @@ You can link the library direclty on you kernel module code, or use the prebuilt
 
 ## Building
 
-You can build the kjson library module and used the Module.symvers generated on your makefile. Or you can put the sources and headers file directly on your project.
+You can build the kjson library module and using the Module.symvers generated on your makefile. Or you can put the sources and headers file directly on your project.
 
 ## Example
 
