@@ -19,4 +19,4 @@ You can link the library direclty on you kernel module code, or use the prebuilt
 
 ## Example
 
-Visit the `sample` subdirectory.
+Visit the `samples` subdirectory.
