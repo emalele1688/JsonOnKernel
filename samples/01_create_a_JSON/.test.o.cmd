@@ -1,1 +1,0 @@
-savedcmd_/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.o := ld -m elf_x86_64 -z noexecstack   -r -o /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.o @/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.mod 

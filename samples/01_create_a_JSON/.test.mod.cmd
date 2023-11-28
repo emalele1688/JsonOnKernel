@@ -1,1 +1,0 @@
-savedcmd_/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.mod := printf '%s\n'   ../../kjson_main.o ../../kjson_parser.o test01.o | awk '!x[$$0]++ { print("/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/"$$0) }' > /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.mod
