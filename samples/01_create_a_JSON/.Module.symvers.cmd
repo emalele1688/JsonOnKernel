@@ -1,0 +1,1 @@
+savedcmd_/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/Module.symvers -T /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/modules.order -i Module.symvers -e 

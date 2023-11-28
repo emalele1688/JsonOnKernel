@@ -1,0 +1,15 @@
+/* You can build the module with the provvided Makefile (on the root of the project) and used as dependency.
+ * Remember to load the kjson.ko module first.
+ */
+
+test-objs := test01.o
+obj-m := test.o
+
+KDIR = /lib/modules/$(shell uname -r)/build
+
+all:
+	echo "Building without kjson library"
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
+clean:
+	rm -v *.o *.ko
+

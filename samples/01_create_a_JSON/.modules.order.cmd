@@ -1,0 +1,1 @@
+savedcmd_/home/emanuele/JsonOnKernel/samples/01_create_a_JSON/modules.order := {   echo /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/test.o; :; } > /home/emanuele/JsonOnKernel/samples/01_create_a_JSON/modules.order
