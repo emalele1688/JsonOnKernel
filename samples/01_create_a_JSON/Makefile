@@ -1,5 +1,5 @@
-# If you define TEST_ONLY env you'll build only the test, without dependency. Be sure to build and inser kjson.ko first.
-# Otherwise, the library is statically insert in the test module.
+# If you define TEST_ONLY env you'll build only the test, using kjson as dependency. Be sure to build kjson library first with the provided makefile and inser the module.
+# If you not define TEST_ONLY, the library is statically insert in the test module.
 
 ifdef TEST_ONLY
 test-objs := test01.o
