@@ -57,7 +57,7 @@ enum kjson_object_type {
 /*
  * kjson_object_t rappresent a JSON object into a JSON data structure.
  * Each kjson_object_t is a node of an Hash Table defined into the kjson_container.
- * Key is the JSON key, used to access the Hash Table.
+ * Key is the JSON key of the object, used to access the Hash Table.
  * data is a variable array that store the JSON value type (int, string, array, ecc).
  */
 struct kjson_object_t {

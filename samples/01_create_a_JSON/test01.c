@@ -13,7 +13,7 @@ int __init test_init(void)
      */
     struct kjstring_t test;
 
-    // We have two objects to read into our first JSON.
+    // We have two objects to read into our first JSON. kjson_object_t is a <key, value> object into kjson_container
     struct kjson_object_t *obj1, *obj2;
 
     // This is the JSON data structure
@@ -42,6 +42,16 @@ int __init test_init(void)
 
     // prints the integer and string value 
     printk(KERN_INFO "TestNumber: %lld, TestName: %s\n", kjson_as_integer(obj1), kjson_as_string(obj2));
+
+    // Adding some others object to the json
+    kjson_push_string_array(my_json, "RandomString", "String1", "String2", "ALotOfStrings");
+
+    // Printig the new json text
+    struct kjstring_t *dmp = kjson_dump(my_json);
+    printk("New json: %s\n", kjstring_str(dmp));
+    
+    // Dealloc the json container
+    kjson_delete_container(my_json);
 
     return 0;
 }
