@@ -119,7 +119,6 @@ void kjson_delete_object(struct kjson_object_t *obj)
 
     kj_dealloc(obj);
 }
-EXPORT_SYMBOL(kjson_delete_object);
 
 void dealloc_string_array(struct kjson_object_t *obj)
 {
