@@ -23,6 +23,10 @@
 #ifndef _KJSTRING_H
 #define _KJSTRING_H
 
+/* 
+ * This library could be useful to use both in kernel and 
+ * user space. KJSON will only use the Kernel space version.
+ */
 #ifdef __KERNEL__
 
 #include <linux/string.h>
@@ -37,6 +41,7 @@
 #include <string.h>
 
 #define kjstring_allocator(size) malloc(size)
+#define kjstring_free(str) free(str)
 
 #endif
 
@@ -62,6 +67,13 @@ struct kjstring_iterator {
 
 #define INTOS_SIZE  16  // Size of buffer for integer to string convertion
 
+/*
+ * This will create a kjstring_t in the current stack.
+ * This function is useful if you need a short string (less than a stack size)
+ * and you don't want to create a new heap area to contain it.
+ * @name: The name of your string object.
+ * @size: The max size of your string object.
+ */
 #define kjstring_static_declare(name, size)                                 \
     struct kjstring_static_##name {                                         \
         size_t buffer_size;                                                 \
@@ -73,9 +85,17 @@ struct kjstring_iterator {
     name->buffer_size = size; name->off = 0; name->str_data = name->__data; \
     memset(name->str_data, 0x0, size)
 
+/*
+ * This will create a kjstring_t object starting from the buffer string pointer.
+ * If you just have a string buffer you can create a kjstring_t object to rappresent your string.
+ * @str: An empty preallocated kjstring_t struct (on your stack or heap).
+ * @buffer: Your string buffer.
+ * @buffer_size: Your string buffer size.
+ * Return: Return the same address of str.
+ */
 static inline struct kjstring_t* kjstring_new_string_buffer(struct kjstring_t *str, char *buffer, size_t buffer_size)
 {
-    if(!str || !buffer)
+    if(!str || !buffer || str->str_data)
         return NULL;
 
     str->buffer_size = buffer_size;
@@ -85,6 +105,12 @@ static inline struct kjstring_t* kjstring_new_string_buffer(struct kjstring_t *s
     return str;
 }
 
+/*
+ * This will allocate a kjstring_t object on the heap.
+ * @size: The max size of your string.
+ * Return: The kjstring_t object.
+ * In this case, you have to call kjstring_free to dealloc the string object.
+ */
 static inline struct kjstring_t *kjstring_alloc(size_t default_size)
 {
     struct kjstring_t *str;
@@ -99,6 +125,9 @@ static inline struct kjstring_t *kjstring_alloc(size_t default_size)
     return str;
 }
 
+/*
+ * The string will be cleared
+ */
 #define kjstring_clear(str) do  {                   \
     str->off = 0;                                   \
     memset(str->str_data, 0x0, str->buffer_size);   \
@@ -118,10 +147,22 @@ static inline struct kjstring_t *kjstring_alloc(size_t default_size)
     }                                                                           \
 } while(0)
 
+/*
+ * Append a string starting to a specific position
+ * @str: kjstring_t object.
+ * @src: The pointer to the string to append.
+ * @pos: The position to start the append
+ */
 static inline void kjstring_append_string(struct kjstring_t *str, char *src, size_t pos) {
     kjstring_append_pos(str, src, pos);
 }
 
+/*
+ * Append an integer starting to a specific position. The integer value will be convert to an ASCII type
+ * @str: kjstring_t object.
+ * @val: The pointer to the integer to append.
+ * @pos: The position to start the append
+ */
 static inline void kjstring_append_integer(struct kjstring_t *str, int64_t val, size_t pos) {
     char integer[INTOS_SIZE];
 
@@ -139,34 +180,68 @@ static inline void __kjstring_no_append(struct kjstring_t *str, int64_t val, siz
     default: __kjstring_no_append                           \
     )(str, src, pos)
 
+/*
+ * Use this to append a string or integer type to your kjstring_t object.
+ * @str: kjstring_t object.
+ * @src: A string or integer value to append
+ */
 #define kjstring_append(str, src) kjstring_insert_type(str, src, str->off)
+
+/*
+ * Use this to truncate the current kjstring_t and add a string or integer type to your kjstring_t object.
+ * @str: kjstring_t object.
+ * @src: A string or integer value to append
+ */
 #define kjstring_trunc(str, src) kjstring_insert_type(str, src, 0)
 
+/*
+ * Push a char value to the kjstring_t object
+ * @str: kjstring_t object.
+ * @chr: A cahr value
+ */
 #define kjstring_push(str, chr) do {                    \
     if(str->off < str->buffer_size - 1)                 \
         str->str_data[str->off++] = chr;                \
 } while(0)
 
+/*
+ * Initialize an iterator.
+ * @str: A non empty kjstring_t object.
+ * @iterator: A preallocated struct kjstring_iterator (usually on your stack)
+ */
 static inline void kjstring_interator_init(const struct kjstring_t *str, struct kjstring_iterator *iterator)
 {
     iterator->str = str;
     iterator->pos = 0;
 }
 
+/*
+ * Reset the iterator. It will start from the position 0
+ */
 #define kjstring_iterator_reset(iterator) (iterator)->pos = 0
 
+/*
+ * Create a copy of the iterator in the iterator_dest. 
+ */
 #define kjstring_copy_iterator(iterator_src, iterator_dest) do {    \
     (iterator_dest)->str = (iterator_src)->str;                     \
     (iterator_dest)->pos = (iterator_src)->pos;                     \
 } while(0)
 
-// TODO convert in a inline function
+/*
+ * Return the current char pointed by the iterator and increment the iterator counter.
+ * @iterator: A kjstring_iterator type.
+ * @chr: An empty char.
+ */
 #define kjstring_iterator_next(iterator, chr) do {          \
     chr = '\0';                                             \
     if((iterator)->pos < (iterator)->str->off)              \
         chr = (iterator)->str->str_data[(iterator)->pos++]; \
 } while(0)
 
+/*
+ * Return the current char pointed by the iterator.
+ */
 static inline char kjstring_iterator_get(struct kjstring_iterator *iterator)
 {
     char ret = '\0';
@@ -180,11 +255,18 @@ static inline char kjstring_iterator_get(struct kjstring_iterator *iterator)
     return ret;
 }
 
+/*
+ * Return true if the iterator point to the end
+ */
 static inline bool kjstring_iterator_end(struct kjstring_iterator *iterator)
 {
     return iterator->pos == iterator->str->off;
 }
 
+/*
+ * Iter all the kjstring_t object.
+ * @chr: An empty char type where the next value will be stored
+ */
 #define kjstring_for_each(iterator, chr)                    \
     for(chr = (iterator)->str->str_data[(iterator)->pos] ;  \
         (iterator)->pos < (iterator)->str->off ;            \
