@@ -88,33 +88,48 @@ extern struct kjson_container *kjson_new_container(void);
 
 /*
  * Dealloc a JSON container with all sub container.
+ * @ctn: Container to dealloc
  */
 extern void kjson_delete_container(struct kjson_container *ctn);
 
 /*
  * Get the Json object with specific key.
+ * @ctn: A non empty JSON contanier.
+ * @key: Key of the object to return.
+ * It returns the kjson_object_t that contains the value with the specific key.
+ * If no object with this key exist, NULL is returned.
  */
 extern struct kjson_object_t *kjson_lookup_object(struct kjson_container *ctn, const char *key);
 
 /*
  * Remove the object with specific key.
+ * @ctn: A non empty JSON contanier.
+ * @key: Key of the object to delete.
  */
 extern void kjson_pop_object(struct kjson_container *ctn, const char *key);
 
 /*
  * Insert an object with the specific key on the ctn container.
  * Used by the utility insert functions below.
+ * @ctn: A non empty JSON contanier.
+ * @key: Key of the new object.
+ * @type: The type of the object. Read the kjson_object_type enum type.
+ * @data: A pointer to the relative data (To an integer, a string (char*), another kjson_t or the first element of the array)
+ * @data_len: Len of the data: (0 for Integer type or one annidate json container, strlen for string type, array element for array type)
+ * In case of success it will return 0.
  */
 extern int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_object_type type, void *data, size_t data_len);
 
 /*
  * Will push a kjson_object_t type.
  * Used by kjson parser engine.
+ * @ctn: A non empty JSON contanier.
+ * @obj: The specific kjson_object_t to push.
  */
 extern int __kjson_push_object(struct kjson_container *ctn, struct kjson_object_t *obj);
 
 /*
- * Remove an object using the kjson_object_t.
+ * Used by the parser. Do not call this function.
  */
 extern void kjson_delete_object(struct kjson_object_t *obj);
 
@@ -216,11 +231,15 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
 
 /*
  * Create a JSON text starting from the internal data structure.
+ * @ctn: A non NULL kjson_container_t
+ * It returns a kjstring_t containing the KJSON Text parsed.
  */
 extern struct kjstring_t *kjson_dump(struct kjson_container *ctn);
 
 /*
- * Parse a JSON text and create the kjson_container object
+ * Parse a JSON text and create the kjson_container object.
+ * @json_str: The json text to parse.
+ * It returns a kjson_container_t built starting by the JSON Text contained into the json_str.
  */
 extern struct kjson_container *kjson_parse(const struct kjstring_t *json_str);
 
