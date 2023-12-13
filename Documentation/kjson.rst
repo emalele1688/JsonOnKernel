@@ -112,8 +112,8 @@ Unsigend Integer 64 bit:
 or 
 
 .. code:: c
-	int val = 2;
-	kjson_push_object(a_json, a_key", KOBJECT_TYPE_INTEGER, &val, 0);
+        int val = 2;
+        kjson_push_object(a_json, a_key", KOBJECT_TYPE_INTEGER, &val, 0);
 
 String:
 
