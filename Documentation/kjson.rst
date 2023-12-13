@@ -64,11 +64,14 @@ Howto Use the Library
 Every JSON is rappresented by the ``struct kjson_container``. You can start to 
 build a new JSON with:
 
-	``struct kjson_container *new_json = kjson_new_container()``
+        .. code:: c
+
+                struct kjson_container *new_json = kjson_new_container();
 	
 Or you can parse an existing JSON text with:
 
-	``struct kjson_container *a_json = kjson_parse(&json_text);``
+        .. code:: c
+	        struct kjson_container *a_json = kjson_parse(&json_text);
 	
 json_text should be a kjstring_t object. For example, consider the following 
 json text string:
