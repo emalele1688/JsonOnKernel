@@ -53,9 +53,10 @@ where you need. Example 01 on the samples folder will help you with this.
 In the case you will use kjson as separate module, remember to insert first the
 kjson.ko module before yours:
 
-	``modprobe kjson.ko``
+	.. code:: shell
 
-	``modprobe your_module.ko``
+                $ modprobe kjson.ko
+	        $ modprobe your_module.ko
 
 Howto Use the Library
 =====================
