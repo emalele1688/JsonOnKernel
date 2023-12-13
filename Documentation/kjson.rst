@@ -243,9 +243,9 @@ To know the lenght of an array object you can use:
 	
         size_t array_len = kjson_array_length(obj)
 	
-Be careful. Each of the macros above must to be used with the correct object 
+**Be careful. Each of the macros above must to be used with the correct object 
 type. Calling, for example, kjson_array_length on an object that is not an array
-will lead to an undefined state.
+or kjson_as_integer on an string object, will lead to an undefined state.**
 
 The internals
 =============
