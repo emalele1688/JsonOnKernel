@@ -19,12 +19,13 @@ user applications use JSON to interchange data over the network or beetwen
 local processes. You could serialize the data in a JSON format on your kernel 
 device to make more easy in user space the communication with it. 
 
-Case of uses: 
-- A complex sensors system that exposed to a user differents data: temperature, 
-  pressure, humidity and so on. You could serialize this data and expose it in 
-  a human-readable format directly in user space.
-- A driver to read informations about the system (statics of a process or
-  memory, system temperature and voltage, and so on).
+Case of uses:
+
+        - A complex sensors system that exposed to a user differents data: 
+          temperature, pressure, humidity and so on. You could serialize this
+          data and expose it in a human-readable format directly in user space.
+        - A driver to read informations about the system (statics of a process
+          or memory, system temperature and voltage, and so on).
 
 Howto Import the Library on your Project
 ========================================
