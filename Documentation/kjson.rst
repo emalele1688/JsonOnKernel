@@ -94,11 +94,13 @@ You can declare json_text_pointer on the stack of your function.
 To create the json text from the data structure you can use the:
 
 .. code:: c
+        
         struct kjstring_t* str_t = kjson_dump(a_json)
 	
 Access the string buffer of the kjstring_t is simple:
 
 .. code:: c
+        
         char* str = kjstring_str(str_t)
 
 Adding object to a JSON
@@ -107,11 +109,13 @@ Adding object to a JSON
 Unsigend Integer 64 bit:
 
 .. code:: c
+        
         kjson_push_integer(a_json, "a_key", 2)
 	
 or 
 
 .. code:: c
+        
         int val = 2;
         kjson_push_object(a_json, a_key", KOBJECT_TYPE_INTEGER, &val, 0);
 
