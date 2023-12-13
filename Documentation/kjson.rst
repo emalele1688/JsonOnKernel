@@ -71,72 +71,86 @@ build a new JSON with:
 Or you can parse an existing JSON text with:
 
 .. code:: c
-        struct kjson_container *a_json = kjson_parse(&json_text);
+        
+        struct kjson_container* a_json = kjson_parse(&json_text);
 
 json_text should be a kjstring_t object. For example, consider the following 
 json text string:
 
 .. code:: c
-        ``char *json_str = "{ ``
-        ``\"TestNumber\": 1,`` 
-        ``\"TestName\": \"LinuxKernelUnderstandJSON\" }";``
+        
+        char* json_str = "{ 
+        \"TestNumber\": 1, 
+        \"TestName\": \"LinuxKernelUnderstandJSON\" }";
 	    
 You can simply create the kjstring_t object that points to your json_str buffer:
 
-	``kjstring_new_string_buffer(&json_text, json_str, strlen(json_str))``
+.. code:: c
+	
+        kjstring_new_string_buffer(&json_text, json_str, strlen(json_str))``
 	
 You can declare json_text_pointer on the stack of your function.
 
 To create the json text from the data structure you can use the:
 
-	``struct kjstring_t *str_t = kjson_dump(a_json)``
+.. code:: c
+        struct kjstring_t* str_t = kjson_dump(a_json)
 	
 Access the string buffer of the kjstring_t is simple:
 
-	``char *str = kjstring_str(str_t)``
-	
+.. code:: c
+        char* str = kjstring_str(str_t)
+
 Adding object to a JSON
 -----------------------
 
 Unsigend Integer 64 bit:
 
-	``kjson_push_integer(a_json, "a_key", 2)``
+.. code:: c
+        kjson_push_integer(a_json, "a_key", 2)
 	
-	or 
-	
-	``int val = 2;``
-	``kjson_push_object(a_json, a_key", KOBJECT_TYPE_INTEGER, &val, 0);``
+or 
+
+.. code:: c
+	int val = 2;
+	kjson_push_object(a_json, a_key", KOBJECT_TYPE_INTEGER, &val, 0);
 
 String:
 
-	``kjson_push_string(a_json, "a_key", "a string")``
+.. code:: c
+	kjson_push_string(a_json, "a_key", "a string")``
 	
-	or
-	
-	``char *str = "blabla";``
-	``kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING,``
-                ``str, strlen(T))``
+or
+
+.. code:: c
+	char* str = "blabla";
+	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING,
+                str, strlen(T))
 	
 Integer array:
 
-	``kjson_push_integer_array(a_json, "a_key", 1, 23, 3, 7)``
+.. code:: c
+	kjson_push_integer_array(a_json, "a_key", 1, 23, 3, 7)
 	
-	or
-	
-	``int64_t *arr = [ 3, 4, 6 ];``
-	``kjson_push_object(a_json, "a_key", KOBJECT_TYPE_INTEGER_ARRAY, arr,`` 
-                ``sizeof(arr) / sizeof(int64_t))``
+or
+
+.. code:: c
+	int64_t* arr = [ 3, 4, 6 ];
+	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_INTEGER_ARRAY, arr, 
+                sizeof(arr) / sizeof(int64_t))
 	
 String array:
 
-	``kjson_push_string_array(a_json, "a_key", "string 1", "string 2",``
-                ``"string n")``
+.. code:: c
+	kjson_push_string_array(a_json, "a_key", "string 1", "string 2",
+                "string n")
 	
-	or
+or
 	
-	``char **arr = [ "hello", "world" ];``
-	``kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING_ARRAY, arr,`` 
-		``sizeof(arr) / sizeof(char*));``
+.. code:: c
+	char** arr = [ "hello", "world" ];
+	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING_ARRAY, arr, 
+		sizeof(arr) / sizeof(char*));
 	
 All the integer ar int64_t.
 String objects are dinamically allocated.
@@ -145,33 +159,39 @@ All the integer and string objects are deeply copied into the kjson structure.
 You can create nested json; First declare and write all annidate json's you 
 need, for example:
 
-	``struct kjson_container *json_a = kjson_new_container()``
-	``struct kjson_container *json_b = kjson_new_container()``
-	``kjson_push_string(json_a, "a_key", "a string")``
-	``kjson_push_integer_array(json_b, "a_key", 1, 23, 3, 7)``
+.. code:: c
+	struct kjson_container* json_a = kjson_new_container()
+	struct kjson_container* json_b = kjson_new_container()
+	kjson_push_string(json_a, "a_key", "a string")
+	kjson_push_integer_array(json_b, "a_key", 1, 23, 3, 7)
 	
 Then, you can nested with:
 
-	``kjson_push_container(a_json, "a_key", json_a)``
+.. code:: c
+	kjson_push_container(a_json, "a_key", json_a)
 	
-	or
-	
-	``kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, json_a, 0)``
+or
+
+.. code:: c
+	kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, json_a, 0)
 	
 or an array of nested json's:
 
-	``kjson_push_container_array(a_json, "a_key", json_a, json_b)``
+.. code:: c
+	kjson_push_container_array(a_json, "a_key", json_a, json_b)
 	
-	or
-	
-	``struct json_container **arr = [ json_a, json_b ];
-	``kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, arr, 0)``
+or
+
+.. code:: c
+	struct json_container** arr = [ json_a, json_b ];
+	kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, arr, 0)
 	
 You must not to deallocate json_a and json_b. The nested json are not deeply
 copied. The kjson deallocator of the parent json object will deallocate it for
 you:
 
-	``kjson_delete_container(a_json)``
+.. code:: c
+	kjson_delete_container(a_json)
 	
 Call kjson_delete_container when you want to destroy your kjson and all nested
 (if there are) from the memory.
@@ -181,25 +201,28 @@ The field type rappresent the type of the value.
 
 To find an object from it's key you can use:
 
-	``struct kjson_object_t *obj = kjson_lookup_object(a_json, "the_key")``
+.. code:: c
+	struct kjson_object_t* obj = kjson_lookup_object(a_json, "the_key")
 	
 Dependig of the type of the object, you can use:
 
-	``int a = kjson_as_integer(obj)``
+.. code:: c
+	int a = kjson_as_integer(obj)
 	
-	``char *str = kjson_as_string(obj)``
+	char* str = kjson_as_string(obj)
 	
-	``struct kjson_container *c = kjson_as_container(obj)``
+	struct kjson_container* c = kjson_as_container(obj)
 	
-	``int *a = kjson_as_integer_array(obj)``
+	int* a = kjson_as_integer_array(obj)
 	
-	``char **str = kjson_as_string_array(obj)``	
+	char** str = kjson_as_string_array(obj)	
 	
-	``struct kjson_container **c = kjson_as_container_array(obj)``
+	struct kjson_container** c = kjson_as_container_array(obj)
 	
 To know the lenght of an array object you can use:
 
-	``size_t array_len = kjson_array_length(obj)``
+.. code:: c
+	size_t array_len = kjson_array_length(obj)
 	
 Be careful. Each of the macros above must to be used with the correct object 
 type. Calling, for example, kjson_array_length on an object that is not an array
