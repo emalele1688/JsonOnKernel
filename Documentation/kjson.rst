@@ -122,37 +122,43 @@ or
 String:
 
 .. code:: c
-	kjson_push_string(a_json, "a_key", "a string")``
+	
+        kjson_push_string(a_json, "a_key", "a string")``
 	
 or
 
 .. code:: c
-	char* str = "blabla";
+	
+        char* str = "blabla";
 	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING,
                 str, strlen(T))
 	
 Integer array:
 
 .. code:: c
-	kjson_push_integer_array(a_json, "a_key", 1, 23, 3, 7)
+	
+        kjson_push_integer_array(a_json, "a_key", 1, 23, 3, 7)
 	
 or
 
 .. code:: c
-	int64_t* arr = [ 3, 4, 6 ];
+	
+        int64_t* arr = [ 3, 4, 6 ];
 	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_INTEGER_ARRAY, arr, 
                 sizeof(arr) / sizeof(int64_t))
 	
 String array:
 
 .. code:: c
-	kjson_push_string_array(a_json, "a_key", "string 1", "string 2",
+	
+        kjson_push_string_array(a_json, "a_key", "string 1", "string 2",
                 "string n")
 	
 or
 	
 .. code:: c
-	char** arr = [ "hello", "world" ];
+	
+        char** arr = [ "hello", "world" ];
 	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING_ARRAY, arr, 
 		sizeof(arr) / sizeof(char*));
 	
@@ -164,7 +170,8 @@ You can create nested json; First declare and write all annidate json's you
 need, for example:
 
 .. code:: c
-	struct kjson_container* json_a = kjson_new_container()
+	
+        struct kjson_container* json_a = kjson_new_container()
 	struct kjson_container* json_b = kjson_new_container()
 	kjson_push_string(json_a, "a_key", "a string")
 	kjson_push_integer_array(json_b, "a_key", 1, 23, 3, 7)
@@ -172,22 +179,26 @@ need, for example:
 Then, you can nested with:
 
 .. code:: c
-	kjson_push_container(a_json, "a_key", json_a)
+	
+        kjson_push_container(a_json, "a_key", json_a)
 	
 or
 
 .. code:: c
-	kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, json_a, 0)
+	
+        kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, json_a, 0)
 	
 or an array of nested json's:
 
 .. code:: c
-	kjson_push_container_array(a_json, "a_key", json_a, json_b)
+	
+        kjson_push_container_array(a_json, "a_key", json_a, json_b)
 	
 or
 
 .. code:: c
-	struct json_container** arr = [ json_a, json_b ];
+	
+        struct json_container** arr = [ json_a, json_b ];
 	kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, arr, 0)
 	
 You must not to deallocate json_a and json_b. The nested json are not deeply
@@ -195,7 +206,8 @@ copied. The kjson deallocator of the parent json object will deallocate it for
 you:
 
 .. code:: c
-	kjson_delete_container(a_json)
+	
+        kjson_delete_container(a_json)
 	
 Call kjson_delete_container when you want to destroy your kjson and all nested
 (if there are) from the memory.
@@ -206,12 +218,14 @@ The field type rappresent the type of the value.
 To find an object from it's key you can use:
 
 .. code:: c
-	struct kjson_object_t* obj = kjson_lookup_object(a_json, "the_key")
+	
+        struct kjson_object_t* obj = kjson_lookup_object(a_json, "the_key")
 	
 Dependig of the type of the object, you can use:
 
 .. code:: c
-	int a = kjson_as_integer(obj)
+	
+        int a = kjson_as_integer(obj)
 	
 	char* str = kjson_as_string(obj)
 	
@@ -226,7 +240,8 @@ Dependig of the type of the object, you can use:
 To know the lenght of an array object you can use:
 
 .. code:: c
-	size_t array_len = kjson_array_length(obj)
+	
+        size_t array_len = kjson_array_length(obj)
 	
 Be careful. Each of the macros above must to be used with the correct object 
 type. Calling, for example, kjson_array_length on an object that is not an array
