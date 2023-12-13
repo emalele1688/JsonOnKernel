@@ -21,7 +21,7 @@ device to make more easy in user space the communication with it.
 
 Case of uses: 
 - A complex sensors system that exposed to a user differents data: temperature, 
-  pressure, humidity and so on. You could serialize this data and expose it in
+  pressure, humidity and so on. You could serialize this data and expose it in 
   a human-readable format directly in user space.
 - A driver to read informations about the system (statics of a process or
   memory, system temperature and voltage, and so on).
@@ -54,6 +54,7 @@ In the case you will use kjson as separate module, remember to insert first the
 kjson.ko module before yours:
 
 	``modprobe kjson.ko``
+
 	``modprobe your_module.ko``
 
 Howto Use the Library
