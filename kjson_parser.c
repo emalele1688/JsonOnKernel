@@ -319,8 +319,9 @@ struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator)
     if(!iterator)
         return NULL;
 
+	// get the json array size - iterator will not change it's position after this call
     array_size = find_array_size(iterator);
-    // if find_array__size is zero the buffer reach the end
+    // if find_array_size is zero the buffer reach the end (no json array detected)
     if(array_size == 0)
         return NULL;
 
@@ -336,14 +337,14 @@ struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator)
     {
         str_size = find_string_size(iterator) + 1; // Last 1 byte for Null terminator
 
-        // TODO DEALLOCATOR
+        // alloc the buffer for the string to insert into the json container
         if((parsed_str_buffer[i] = kzalloc(str_size, GFP_KERNEL)) == NULL)
             goto FAIL;
 
         kjstring_new_string_buffer(&parsed_str, parsed_str_buffer[i], str_size);
 
         if(parse_string(iterator, &parsed_str))
-            goto FAIL; // TODO DEALLOCATOR
+            goto FAIL; // TODO the last parsed_str_buffer allocated will not release - improve the deallocator
 
         pop_nospace(iterator, nextchar);
         if(nextchar != ',')
@@ -605,11 +606,9 @@ OUT:
     return ctn;
 }
 
-struct kjson_container *kjson_parse(const struct kjstring_t *json_str)
+struct kjson_container *kjson_parse(const char *json_str)
 {
-    struct kjstring_iterator iterator;
-    kjstring_interator_init(json_str, &iterator);
-
+	kjstring_iterator_from_string(iterator, json_str);
     return kjson_start_parser(&iterator, false);
 }
 EXPORT_SYMBOL_GPL(kjson_parse);

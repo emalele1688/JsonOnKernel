@@ -53,7 +53,10 @@ struct kjstring_t {
      * Data could be allocated in another place or embedded in the current struct.
      * In this last case, str_data points to __data (so it points the field just after it self)
      */
-    char *str_data;
+	union {
+	    char *str_data;
+	    const char *c_str_data;
+    };
     char __data[];
 };
 
@@ -69,10 +72,10 @@ struct kjstring_iterator {
 
 /*
  * This will create a kjstring_t in the current stack.
- * This function is useful if you need a short string (less than a stack size)
+ * This function is useful if you need to allocate a short string (less than a stack size)
  * and you don't want to create a new heap area to contain it.
  * @name: The name of your string object.
- * @size: The max size of your string object.
+ * @size: The max size of your string object including null terminator.
  */
 #define kjstring_static_declare(name, size)                                 \
     struct kjstring_static_##name {                                         \
@@ -88,18 +91,20 @@ struct kjstring_iterator {
 /*
  * This will create a kjstring_t object starting from the buffer string pointer.
  * If you just have a string buffer you can create a kjstring_t object to rappresent your string.
+ * Be careful, if the kjstring_t object passed as first parameter already points to a buffer, it will be lost. 
  * @str: An empty preallocated kjstring_t struct (on your stack or heap).
  * @buffer: Your string buffer.
- * @buffer_size: Your string buffer size.
+ * @buffer_size: Your string buffer size including null terminator.
  * Return: Return the same address of str.
  */
 static inline struct kjstring_t* kjstring_new_string_buffer(struct kjstring_t *str, char *buffer, size_t buffer_size)
 {
-    if(!str || !buffer || str->str_data)
+    if(!str || !buffer)
         return NULL;
 
     str->buffer_size = buffer_size;
-    str->off = strnlen(buffer, buffer_size);
+    // If the string is empty, off will be 0. Otherwise it will be the last character before 0
+    str->off = strnlen(buffer, buffer_size - 1);
     str->str_data = buffer;
 
     return str;
@@ -216,6 +221,24 @@ static inline void kjstring_interator_init(const struct kjstring_t *str, struct 
 }
 
 /*
+ * Declare an iterator on the stack directly using a const char* or char* null term string.
+ * Useful if you have a char* pointer to a string and you want a fast secure way to iter on it.
+ * @iter_name: The name of the iterator to declare
+ * @char_str: A const char* or char* string pointer
+ */
+#define kjstring_iterator_from_string(iter_name, char_str)			\
+	const struct kjstring_t __kj_##iter_name = { 					\
+		.buffer_size = strlen(char_str) + 1,						\
+		.off = strlen(char_str),									\
+		.c_str_data = char_str,										\
+	};																\
+	struct kjstring_iterator iter_name = {							\
+		.str = &__kj_##iter_name,									\
+		.pos = 0,													\
+	};																\
+
+
+/*
  * Reset the iterator. It will start from the position 0
  */
 #define kjstring_iterator_reset(iterator) (iterator)->pos = 0
@@ -236,7 +259,7 @@ static inline void kjstring_interator_init(const struct kjstring_t *str, struct 
 #define kjstring_iterator_next(iterator, chr) do {          \
     chr = '\0';                                             \
     if((iterator)->pos < (iterator)->str->off)              \
-        chr = (iterator)->str->str_data[(iterator)->pos++]; \
+        chr = (iterator)->str->c_str_data[(iterator)->pos++]; \
 } while(0)
 
 /*
@@ -250,7 +273,7 @@ static inline char kjstring_iterator_get(struct kjstring_iterator *iterator)
         return ret;
 
     if(iterator->pos < iterator->str->off)
-        ret = iterator->str->str_data[iterator->pos];
+        ret = iterator->str->c_str_data[iterator->pos];
 
     return ret;
 }
@@ -268,8 +291,11 @@ static inline bool kjstring_iterator_end(struct kjstring_iterator *iterator)
  * @chr: An empty char type where the next value will be stored
  */
 #define kjstring_for_each(iterator, chr)                    \
-    for(chr = (iterator)->str->str_data[(iterator)->pos] ;  \
+    for(chr = (iterator)->str->c_str_data[(iterator)->pos] ;  \
         (iterator)->pos < (iterator)->str->off ;            \
-        chr = (iterator)->str->str_data[++(iterator)->pos])
+        chr = (iterator)->str->c_str_data[++(iterator)->pos])
 
 #endif
+
+
+

@@ -6,13 +6,6 @@
 
 int __init test_init(void)
 {
-    /* 
-     * kjstring is an internal object to rappresent a string type.
-     * It contains utility function to manage a string type with iterator and insertion functions. 
-     * test is the JSON string to parse.
-     */
-    struct kjstring_t test;
-
     // We have two objects to read into our first JSON. kjson_object_t is a <key, value> object into kjson_container
     struct kjson_object_t *obj1, *obj2;
 
@@ -23,13 +16,8 @@ int __init test_init(void)
     char *json_str = 
 	    "{ \"TestNumber\": 1, \"TestName\": \"LinuxKernelUnderstandJSON\" }";
 
-    /* Create the stream buffer from the json_str. (kjson uses kjstring for string type).
-     * kjstring_new_string_buffer creates a kjstring object using a preallocated area (json_str).
-     */
-    kjstring_new_string_buffer(&test, json_str, strlen(json_str));
-
     // Parse the json string
-    my_json = kjson_parse(&test);
+    my_json = kjson_parse(json_str);
     if(!my_json)
     {
 		printk(KERN_INFO "parse error\n");

@@ -12,7 +12,7 @@
 #include "../../kjson.h"
 
 // We are receiving this JSON from somewhere (a process or file for example)
-char *a_json = "{ \"process_pid\": 1, \"request\": [\"process_path\", \"file_open\", \"process_socket\"] }";
+const char *a_json = "{ \"process_pid\": 1, \"request\": [\"process_path\", \"file_open\", \"process_socket\"] }";
 
 // Insert the excutable process path of task into the my_json structure
 static void set_process_path(struct kjson_container *my_json, struct task_struct *task);
@@ -28,13 +28,9 @@ int __init test_init(void)
     
     // kjson_object_t rappresent a single <key, value> on a kjson_container
     struct kjson_object_t *obj;
-    
-    // Setup the JSON string to parse
-    struct kjstring_t json_str;
-    kjstring_new_string_buffer(&json_str, a_json, strlen(a_json));
-    
+        
     // Parse the json string
-    my_json = kjson_parse(&json_str);
+    my_json = kjson_parse(a_json);
     if(!my_json)
     {
 		pr_info("parse error\n");
@@ -42,15 +38,17 @@ int __init test_init(void)
     }
     
     // Read the elements using the key
-    obj = kjson_lookup_object(my_json, "process_pid");
+    if((obj = kjson_lookup_object(my_json, "process_pid")) == NULL)
+    	goto EXIT;
     pid_t ppid = kjson_as_integer(obj);
     
-    obj = kjson_lookup_object(my_json, "request");
+    if((obj = kjson_lookup_object(my_json, "request")) == NULL)
+    	goto EXIT;
     // Get the array len
     size_t array_len = kjson_array_length(obj); 
     // Get the pointer to the string array
     char **options = kjson_as_string_array(obj);
-    
+
     // ------ Execute our program ------
 
     struct task_struct *task = get_pid_task(find_get_pid(ppid), PIDTYPE_TGID);
