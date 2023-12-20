@@ -68,7 +68,7 @@ struct kjson_object_t {
 };
 
 /*
- * If data is an array, it's header is defined by this struct
+ * If data field on kjson_object_t is an array, it's header is defined by this struct
  */
 struct kjson_array_struct {
     size_t len;

@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 // Authors: Emanuele Santini <emanuele.santini.88@gmail.com>
 
+/* Hoto use it:
+ * insmod test.ko
+ * read dmesg command output
+ * rmmod test.ko
+ */
+
 #include <linux/module.h>
 #include "../../kjson.h"
 

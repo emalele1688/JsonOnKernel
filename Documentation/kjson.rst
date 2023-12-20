@@ -74,7 +74,7 @@ Or you can parse an existing JSON text with:
         
         struct kjson_container* a_json = kjson_parse(json_str);
 
-json_str should be a non NULL const char* poitner. For example, the following 
+json_str should be a non NULL const char* pointer. For example, the following 
 json text string:
 
 .. code:: c
