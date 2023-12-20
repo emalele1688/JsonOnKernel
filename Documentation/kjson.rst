@@ -41,8 +41,7 @@ We have two sources file:
 And one utility library:
 	
 - kjstring_t -> Internally, KJSON library uses this utility lib to iterate the
-  JSON text string. It is used to parse JSON text, and to dump from an exist 
-  JSON string.
+  JSON text string.
 	
 The main interface to the library is the kjson.h header file.
 
@@ -73,9 +72,9 @@ Or you can parse an existing JSON text with:
 
 .. code:: c
         
-        struct kjson_container* a_json = kjson_parse(&json_text);
+        struct kjson_container* a_json = kjson_parse(json_str);
 
-json_text should be a kjstring_t object. For example, consider the following 
+json_str should be a non NULL const char* poitner. For example, the following 
 json text string:
 
 .. code:: c
@@ -83,14 +82,6 @@ json text string:
         char* json_str = "{ 
         \"TestNumber\": 1, 
         \"TestName\": \"LinuxKernelUnderstandJSON\" }";
-	    
-You can simply create the kjstring_t object that points to your json_str buffer:
-
-.. code:: c
-	
-        kjstring_new_string_buffer(&json_text, json_str, strlen(json_str))``
-	
-You can declare json_text_pointer on the stack of your function.
 
 To create the json text from the data structure you can use the:
 
