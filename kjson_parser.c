@@ -28,12 +28,12 @@
 #define pop_nospace(iterator, chr) do {         \
     do {                                        \
         kjstring_iterator_next(iterator, chr);  \
-    } while(chr == 0x20);                       \
+    } while(chr == 0x20 || chr == 0xa);         \
 } while(0)
 
 #define get_nospace(iterator, chr) do {         \
     chr = kjstring_iterator_get(iterator);      \
-    while(chr == 0x20) {                        \
+    while(chr == 0x20 || chr == 0xa) {			\
         kjstring_iterator_next(iterator, chr);  \
         chr = kjstring_iterator_get(iterator);  \
     }                                           \
