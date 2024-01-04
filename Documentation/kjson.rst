@@ -55,7 +55,7 @@ kjson.ko module before yours:
 
 	.. code:: shell
 
-                $ modprobe kjson.ko
+            $ modprobe kjson.ko
 	        $ modprobe your_module.ko
 
 Howto Use the Library
@@ -154,7 +154,7 @@ or
 	kjson_push_object(a_json, "a_key", KOBJECT_TYPE_STRING_ARRAY, arr, 
 		sizeof(arr) / sizeof(char*));
 	
-All the integer ar int64_t.
+All the integer are int64_t.
 String objects are dinamically allocated.
 All the integer and string objects are deeply copied into the kjson structure.
 
@@ -194,8 +194,8 @@ or
 	kjson_push_object(a_json, "key", KOBJECT_TYPE_OBJECT, arr, 0)
 	
 You must not to deallocate json_a and json_b. The nested json are not deeply
-copied. The kjson deallocator of the parent json object will deallocate it for
-you:
+copied. When you will destroy the parent json (a_json in the example), the 
+childs (json_a and json_b) will be deallocated:
 
 .. code:: c
 	
@@ -235,9 +235,10 @@ To know the lenght of an array object you can use:
 	
         size_t array_len = kjson_array_length(obj)
 	
-**Be careful. Each of the macros above must to be used with the correct object 
-type. Calling, for example, kjson_array_length on an object that is not an array
-or kjson_as_integer on an string object, will lead to an undefined state.**
+**Be careful. Each of the access functions above must to be used with the 
+correct object type. Calling, for example, kjson_array_length on an object that
+is not an array or kjson_as_integer on an string object, will lead to an 
+undefined state.**
 
 The internals
 =============
