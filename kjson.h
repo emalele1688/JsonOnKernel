@@ -83,6 +83,8 @@ struct kjson_array_struct {
 
 /*
  * Creates a new JSON container.
+ * It returns the kjson_container object pointer, or an error code 
+ * in case of error (ENOMEM).
  */
 extern struct kjson_container *kjson_new_container(void);
 
@@ -233,14 +235,16 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
  * Create a JSON text starting from the internal data structure.
  * @ctn: A non NULL kjson_container_t
  * It returns a kjstring_t containing the KJSON Text parsed.
- * The kjstring_t object returned must to be released with kjstring_free function
+ * An error code is returned in case of error. (ENOMEM)
+ * The kjstring_t object returned must to be released with kjstring_free function.
  */
 extern struct kjstring_t *kjson_dump(struct kjson_container *ctn);
 
 /*
  * Parse a JSON text and create the kjson_container object.
  * @json_str: The string buffer containing the json text to parse.
- * It returns a kjson_container_t built starting by the JSON Text contained into the json_str.
+ * It returns a kjson_container built starting by the JSON Text contained into the json_str.
+ * In case of error, NULL is returned.
  */
 extern struct kjson_container *kjson_parse(const char *json_str);
 
