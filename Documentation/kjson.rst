@@ -74,6 +74,11 @@ Or you can parse an existing JSON text with:
         
         struct kjson_container* a_json = kjson_parse(json_str);
 
+kjson_parse returns NULL in case of error.        
+The json parser is able to register an error message in case of parsing error.
+If kjson_parse returns NULL, you can read the error message pointed by (the 
+char* type) kjstring_parser_error_msg.
+
 json_str should be a non NULL const char* pointer. For example, the following 
 json text string:
 
