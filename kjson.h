@@ -75,6 +75,21 @@ struct kjson_array_struct {
     char data[];
 };
 
+#define KJSTRING_PARSER_ERR_MSG_SIZE	512
+/*
+ * KJSON parser error struct - it is a redefinition of the struct kjstring
+ */
+struct kjstring_parser_error {
+    size_t buffer_size;
+    size_t off;
+	char *str_data;
+    char __data[KJSTRING_PARSER_ERR_MSG_SIZE];
+} __no_randomize_layout;
+
+extern struct kjstring_parser_error kjson_parser_error;
+
+#define kjstring_parser_error_msg	kjson_parser_error.str_data
+
 /*
  * Alloc and Dealloc a kjson_object_t
  */

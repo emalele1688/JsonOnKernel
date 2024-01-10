@@ -58,7 +58,7 @@ struct kjstring_t {
 	    const char *c_str_data;
     };
     char __data[];
-};
+} __no_randomize_layout;
 
 struct kjstring_iterator {
     const struct kjstring_t *str;
@@ -181,6 +181,7 @@ static inline void __kjstring_no_append(struct kjstring_t *str, int64_t val, siz
 
 #define kjstring_insert_type(str, src, pos) _Generic((src), \
     char*: kjstring_append_string,                          \
+    const char*: kjstring_append_string,                    \
     int64_t: kjstring_append_integer,                       \
     default: __kjstring_no_append                           \
     )(str, src, pos)

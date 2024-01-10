@@ -62,11 +62,27 @@ static struct kjson_object_t *parse_ctn_array(struct kjstring_iterator *iterator
 
 // TODO static struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator);
 
-
 static size_t find_string_size(struct kjstring_iterator *iterator);
 static size_t find_array_size(struct kjstring_iterator *iterator);
 static size_t find_ctn_array_size(struct kjstring_iterator *iterator);
 
+struct kjstring_parser_error kjson_parser_error = {
+	.buffer_size = KJSTRING_PARSER_ERR_MSG_SIZE,
+	.off = 0,
+	.str_data = NULL
+};
+
+static inline void set_error(char *msg, int64_t pos, char character) 
+{
+	kjstring_append(((struct kjstring_t*)&kjson_parser_error), msg);
+	kjstring_append(((struct kjstring_t*)&kjson_parser_error), ". Position: ");
+	kjstring_append(((struct kjstring_t*)&kjson_parser_error), pos);
+	kjstring_append(((struct kjstring_t*)&kjson_parser_error), ", Character: ");
+	// For a char type kjstring_push is more efficent
+	kjstring_push(((struct kjstring_t*)&kjson_parser_error), character);
+	
+	printk("%s %lld %c\n", msg, pos, character);
+}
 
 int parse_integer(struct kjstring_iterator *iterator, int64_t *ret_value)
 {
@@ -78,25 +94,36 @@ int parse_integer(struct kjstring_iterator *iterator, int64_t *ret_value)
 
     get_nospace(iterator, nextchar);
     if(nextchar < 0x30 || nextchar > 0x39)
+    {
+	    set_error("Invalid integer character", iterator->pos, nextchar);
         return 1;
+    }
 
     do
     {
         kjstring_push(string_integer, nextchar);
         kjstring_iterator_next(iterator, nextchar);
         nextchar = kjstring_iterator_get(iterator);
-    } while(nextchar >= 0x30 && nextchar < 0x39);
+    } while(nextchar >= 0x30 && nextchar <= 0x39);
 
     if(nextchar == '\0')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 1;
+    }
 
-    // TODO Da controllare:
     // An integer shall be terminated by one of this char's: ' ' ',' ']'
     if(nextchar != ' ' && nextchar != ',' && nextchar != ']' && nextchar != '}')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 1;
+    }
 
     if(kstrtol(kjstring_str(string_integer), 10, (long*)ret_value))
+    {
+    	set_error("Integer error", iterator->pos, nextchar);
         return 1;
+  	}
 
     return 0;
 }
@@ -108,6 +135,7 @@ int parse_string(struct kjstring_iterator *iterator, struct kjstring_t *ret_str)
     pop_nospace(iterator, nextchar);
     // printk("nextchar %c\n", nextchar);
     if(nextchar != '\"') {
+	    set_error("Character not recognized - do you miss '\"' ?", iterator->pos, nextchar);
         return 1;
     }
 
@@ -119,7 +147,10 @@ int parse_string(struct kjstring_iterator *iterator, struct kjstring_t *ret_str)
     }
 
     if(nextchar == '\0')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 1;
+    }
 
     return 0;
 }
@@ -133,7 +164,9 @@ size_t find_string_size(struct kjstring_iterator *iterator)
     kjstring_copy_iterator(iterator, &iter_cpy);
 
     pop_nospace(&iter_cpy, nextchar);
-    if(nextchar != '\"') {
+    if(nextchar != '\"') 
+    {
+	    set_error("Character not recognized - do you miss '\"' ?", iterator->pos, nextchar);
         return 0;
     }
 
@@ -145,7 +178,10 @@ size_t find_string_size(struct kjstring_iterator *iterator)
     }
 
     if(nextchar == '\0')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 0;
+    }
 
     return size;
 }
@@ -155,7 +191,10 @@ struct kjson_object_t *parse_integer_object(struct kjstring_iterator *iterator)
     struct kjson_object_t *obj;
 
     if(kj_alloc(obj, sizeof(int64_t)) == NULL)
+    {
+	    set_error("Unable to alloc memory", iterator->pos, '\0');
         return NULL;
+    }
 
     if(parse_integer(iterator, (int64_t*)obj->data))
     {
@@ -179,7 +218,10 @@ struct kjson_object_t *parse_string_object(struct kjstring_iterator *iterator)
 
     obj_size = find_string_size(iterator) + 1;
     if(kj_alloc(obj, obj_size) == NULL)
+    {
+    	set_error("Unable to alloc memory", iterator->pos, '\0');
         return NULL;
+    }
 
     kjstring_new_string_buffer(&tmp_string, obj->data, obj_size);
 
@@ -203,7 +245,10 @@ struct kjson_object_t *parse_ctn_object(struct kjstring_iterator *iterator)
         return NULL;
 
     if(kj_alloc(obj, sizeof(struct kjson_container*)) == NULL)
+    {
+	    set_error("Unable to alloc memory", iterator->pos, '\0');
         return NULL;
+    }
 
     obj->type = KOBJECT_TYPE_OBJECT;
     *(struct kjson_container**)obj->data = (struct kjson_container*)nest;
@@ -221,7 +266,10 @@ struct kjson_object_t *parse_array_object(struct kjstring_iterator *iterator)
 
     pop_nospace(iterator, nextchar);
     if(nextchar != '[')
+    {
+	    set_error("Invalid operand on array of objects", iterator->pos, nextchar);
         return NULL;
+    }
 
     get_nospace(iterator, nextchar);
 
@@ -234,7 +282,10 @@ struct kjson_object_t *parse_array_object(struct kjstring_iterator *iterator)
 
             // Return empty array
             if(kj_alloc(obj, sizeof(struct kjson_array_struct)) == NULL)
+            {
+            	set_error("Unable to alloc memory", iterator->pos, '\0');
                 return NULL;
+        	}
 
             // We consider an empty array as an integer empty array
             obj->type = KOBJECT_TYPE_INTEGER_ARRAY;
@@ -273,7 +324,10 @@ size_t find_array_size(struct kjstring_iterator *iterator)
     while(nextchar != ']' && nextchar != '\0');
 
     if(nextchar == '\0')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 0;
+    }
 
     return array_size;
 }
@@ -302,7 +356,10 @@ size_t find_ctn_array_size(struct kjstring_iterator *iterator)
     while(nextchar != '\0');
 
     if(nextchar == '\0')
+    {
+	    set_error("Syntax error", iterator->pos, nextchar);
         return 0;
+    }
 
     return array_size;
 }
@@ -326,7 +383,10 @@ struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator)
         return NULL;
 
     if(kj_alloc(obj, (array_size * sizeof(char*)) + sizeof(struct kjson_array_struct)) == NULL)
+    {
+    	set_error("Unable to alloc memory", iterator->pos, '\0');
         return NULL;
+    }
 
     obj->type = KOBJECT_TYPE_STRING_ARRAY;
     data_hdr = (struct kjson_array_struct*)obj->data;
@@ -339,7 +399,10 @@ struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator)
 
         // alloc the buffer for the string to insert into the json container
         if((parsed_str_buffer[i] = kzalloc(str_size, GFP_KERNEL)) == NULL)
+        {
+        	set_error("Unable to alloc memory", iterator->pos, '\0');
             goto FAIL;
+        }
 
         kjstring_new_string_buffer(&parsed_str, parsed_str_buffer[i], str_size);
 
@@ -352,7 +415,9 @@ struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator)
             if(nextchar == ']' && i == array_size - 1)
                 goto OUT;
             else
+            {
                 goto FAIL;
+            }
         }
     }
 
@@ -530,7 +595,10 @@ struct kjson_object_t *kjson_parse_object(struct kjstring_iterator *iterator)
     /* Two points after key */
     pop_nospace(iterator, nextchar);
     if(nextchar != ':')
+    {
+	    set_error("Character not recognized - do you miss ':' ?", iterator->pos, nextchar);
         return NULL;
+    }
 
     /* Parse value and create kjson_object_t */
     if((obj = parse_value(iterator)) == NULL)
@@ -551,10 +619,16 @@ struct kjson_container *kjson_start_parser(struct kjstring_iterator *iterator, b
     pop_nospace(iterator, nextchar);
 
     if(nextchar != '{')
+    {
+    	set_error("No starting scoope found", iterator->pos, nextchar);
         return NULL;
+    }
 
-    if((ctn = kjson_new_container()) == NULL)
+    if(IS_ERR(ctn = kjson_new_container()))
+    {
+	    set_error("Unable to create a new kjson container", iterator->pos, nextchar);
         return NULL;
+    }
 
     // If is empty ?
     get_nospace(iterator, nextchar_t);
@@ -565,7 +639,10 @@ struct kjson_container *kjson_start_parser(struct kjstring_iterator *iterator, b
 
         // nested json cannot terminate with \0 just after the }
         if(!is_nested && nextchar != '\0')
+        {
+        	set_error("Json not recognized - syntax error", iterator->pos, nextchar);
             return NULL;
+        }
         else
             return ctn;
     }
@@ -578,6 +655,7 @@ struct kjson_container *kjson_start_parser(struct kjstring_iterator *iterator, b
 
         if(__kjson_push_object(ctn, obj))
         {
+        	set_error("Unable to push a new object to the kjson container", iterator->pos, nextchar);        	
             kjson_delete_object(obj);
             goto FAIL;
         }
@@ -586,14 +664,20 @@ struct kjson_container *kjson_start_parser(struct kjstring_iterator *iterator, b
     }
 
     if(nextchar == '\0')
+    {
+    	set_error("Json ends without anything to parse", iterator->pos, nextchar); 
         goto FAIL;
+    }
 
     // If this is not a nested json, we don't have anymore charachter after the last scope '}'
     if(!is_nested)
     {
         pop_nospace(iterator, nextchar);
         if(nextchar != '\0')
+        {
+	        set_error("Json contains strange characters after the end scoope", iterator->pos, nextchar);
             goto FAIL;
+        }
     }
 
     goto OUT;
@@ -608,6 +692,10 @@ OUT:
 
 struct kjson_container *kjson_parse(const char *json_str)
 {
+	// Inizialize the memory for errors message
+	kjson_parser_error.str_data = kjson_parser_error.__data;
+	kjstring_clear(((struct kjstring_t*)&kjson_parser_error));
+	
 	kjstring_iterator_from_string(iterator, json_str);
     return kjson_start_parser(&iterator, false);
 }
