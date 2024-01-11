@@ -88,7 +88,7 @@ struct kjstring_parser_error {
 
 extern struct kjstring_parser_error kjson_parser_error;
 
-#define kjstring_parser_error_msg	kjson_parser_error.str_data
+#define kjson_parser_error_msg	kjson_parser_error.str_data
 
 /*
  * Alloc and Dealloc a kjson_object_t
