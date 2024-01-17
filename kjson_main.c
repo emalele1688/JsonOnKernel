@@ -501,5 +501,5 @@ struct kjstring_t *kjson_dump(struct kjson_container *ctn)
 EXPORT_SYMBOL_GPL(kjson_dump);
 
 MODULE_LICENSE("GPL");
-
+MODULE_AUTHOR("Emanuele Santini <emanuele.santini.88@gmail.com>");
 
