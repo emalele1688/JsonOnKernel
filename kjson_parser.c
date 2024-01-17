@@ -702,4 +702,4 @@ struct kjson_container *kjson_parse(const char *json_str)
 EXPORT_SYMBOL_GPL(kjson_parse);
 
 MODULE_LICENSE("GPL");
-
+MODULE_AUTHOR("Emanuele Santini <emanuele.santini.88@gmail.com>");
