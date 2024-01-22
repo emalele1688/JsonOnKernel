@@ -45,6 +45,8 @@ static struct kjson_object_t* __kjson_create_ctn_object(void *data, size_t data_
 static struct kjson_object_t* __kjson_create_integer_array(void *data, size_t data_len);
 static struct kjson_object_t* __kjson_create_string_array(void *data, size_t data_len);
 static struct kjson_object_t* __kjson_create_ctn_object_array(void *data, size_t data_len);
+static struct kjson_object_t* __kjson_create_null(void *data, size_t data_len);
+static struct kjson_object_t* __kjson_create_bool(void *data, size_t data_len);
 
 typedef struct kjson_object_t* (*kjson_create_ops_t)(void*, size_t);
 
@@ -57,6 +59,8 @@ static void __kjson_dump_ctn_object(struct kjson_object_t *obj, struct kjstring_
 static void __kjson_dump_integer_array(struct kjson_object_t *obj, struct kjstring_t *json_dmp);
 static void __kjson_dump_string_array(struct kjson_object_t *obj, struct kjstring_t *json_dmp);
 static void __kjson_dump_ctn_object_array(struct kjson_object_t *obj, struct kjstring_t *json_dmp);
+static void __kjson_dump_null(struct kjson_object_t *obj, struct kjstring_t *json_dmp);
+static void __kjson_dump_bool(struct kjson_object_t *obj, struct kjstring_t *json_dmp);
 
 typedef void (*kjson_dump_ops_t)(struct kjson_object_t*, struct kjstring_t*);
 
@@ -313,6 +317,28 @@ struct kjson_object_t *__kjson_create_ctn_object_array(void *data, size_t data_l
     return obj;
 }
 
+struct kjson_object_t* __kjson_create_null(void *data, size_t data_len)
+{
+	struct kjson_object_t *obj;
+	
+    if(kj_alloc(obj, 0) == NULL)
+        return NULL;
+        
+    return obj;
+}
+
+struct kjson_object_t* __kjson_create_bool(void *data, size_t data_len)
+{
+	struct kjson_object_t *obj;
+	
+    if(kj_alloc(obj, sizeof(int)) == NULL)
+        return NULL;
+        
+    *(int*)obj->data = *(int*)data;
+
+    return obj;
+}
+
 // Do not change the sequence of this array
 static kjson_create_ops_t kj_create_ops[] = {
     __kj_create_integer,
@@ -320,7 +346,9 @@ static kjson_create_ops_t kj_create_ops[] = {
     __kjson_create_ctn_object,
     __kjson_create_integer_array,
     __kjson_create_string_array,
-    __kjson_create_ctn_object_array
+    __kjson_create_ctn_object_array,
+    __kjson_create_null,
+    __kjson_create_bool
 };
 
 // void kjson_push_object(struct kjson_container *json_ctn, kjson_type type, const char *key, void *data, ...)
@@ -328,9 +356,12 @@ int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_o
 {
     struct kjson_object_t *obj;
 
-    if(unlikely(!ctn || !key || !data))
+    if(unlikely(!ctn || !key))
         return -EINVAL;
 
+    if(unlikely(!data && type != KOBJECT_TYPE_OBJECT_NULL))
+        return -EINVAL;
+        
     if((int)type > KOBJECT_NUM - 1 || (int)type < 0)
         return -EINVAL;
 
@@ -390,7 +421,9 @@ kjson_dump_ops_t kjson_dump_ops[] = {
     __kjson_dump_ctn_object,
     __kjson_dump_integer_array,
     __kjson_dump_string_array,
-    __kjson_dump_ctn_object_array
+    __kjson_dump_ctn_object_array,
+    __kjson_dump_null,
+    __kjson_dump_bool
 };
 
 void __kjson_dump_integer(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
@@ -439,6 +472,22 @@ void __kjson_dump_ctn_object_array(struct kjson_object_t *obj, struct kjstring_t
 
     set_key(json_dmp, obj->key);
     set_ctn_array(json_dmp, ctn, kjson_array_length(obj));
+}
+
+void __kjson_dump_null(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
+{
+    set_key(json_dmp, obj->key);
+    kjstring_append(json_dmp, "null");
+}
+
+void __kjson_dump_bool(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
+{
+    set_key(json_dmp, obj->key);
+    
+    if(kjson_as_bool(obj))
+   		kjstring_append(json_dmp, "true");
+   	else
+	   	kjstring_append(json_dmp, "false");
 }
 
 int kjson_dump_object(struct kjson_object_t *obj, struct kjstring_t *json_dmp)

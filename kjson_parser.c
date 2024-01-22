@@ -59,8 +59,7 @@ static struct kjson_object_t *parse_array_object(struct kjstring_iterator *itera
 static struct kjson_object_t *parse_string_array(struct kjstring_iterator *iterator);
 static struct kjson_object_t *parse_integer_array(struct kjstring_iterator *iterator);
 static struct kjson_object_t *parse_ctn_array(struct kjstring_iterator *iterator);
-
-// TODO static struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator);
+static struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator);
 
 static size_t find_string_size(struct kjstring_iterator *iterator);
 static size_t find_array_size(struct kjstring_iterator *iterator);
@@ -542,7 +541,48 @@ OUT:
     return obj;
 }
 
-// TODO static struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator);
+struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator)
+{
+	struct kjson_object_t *obj = NULL;
+	char nextchar;
+	
+	if(!iterator || !iterator->str)
+    	return NULL;
+
+    const char *next_str = kjstring_iterator_follow(iterator);
+
+	if(!strncmp(next_str, "null", 4) || !strncmp(next_str, "NULL", 4))
+	{
+		if(kj_alloc(obj, 0) == NULL)
+		    return NULL;
+
+		obj->type = KOBJECT_TYPE_OBJECT_NULL;
+		
+	    iterator->pos += 4;
+	}
+	else if(!strncmp(next_str, "true", 4) || !strncmp(next_str, "TRUE", 4))
+	{
+		if(kj_alloc(obj, sizeof(int)) == NULL)
+			return NULL;
+
+		obj->type = KOBJECT_TYPE_OBJECT_BOOL;
+	    *(int*)obj->data = 1;
+	    
+	    iterator->pos += 4;
+	}
+	else if(!strncmp(next_str, "false", 5) || !strncmp(next_str, "FALSE", 5))
+	{
+		if(kj_alloc(obj, sizeof(int)) == NULL)
+			return NULL;
+		    		    printk("c\n");
+		obj->type = KOBJECT_TYPE_OBJECT_BOOL;
+	    *(int*)obj->data = 0;
+	    
+	    iterator->pos += 5;
+	}
+
+	return obj;
+}
 
 struct kjson_object_t *parse_value(struct kjstring_iterator *iterator)
 {
@@ -568,7 +608,7 @@ struct kjson_object_t *parse_value(struct kjstring_iterator *iterator)
         case 'F':
         case 't':
         case 'T':
-            //obj = parse_null_bool_object(iterator);
+            obj = parse_null_bool_object(iterator);
             break;
         default:
             obj = parse_integer_object(iterator);

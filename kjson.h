@@ -51,7 +51,9 @@ enum kjson_object_type {
     KOBJECT_TYPE_INTEGER_ARRAY  = 4,
     KOBJECT_TYPE_STRING_ARRAY   = 5,
     KOBJECT_TYPE_OBJECT_ARRAY   = 6,
-    KOBJECT_NUM                 = 7
+    KOBJECT_TYPE_OBJECT_NULL	= 7,
+    KOBJECT_TYPE_OBJECT_BOOL	= 8,
+    KOBJECT_NUM                 = 9
 };
 
 /*
@@ -207,6 +209,18 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
     kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_ARRAY, arr, sizeof(arr) / sizeof(struct kjson_container*));     \
 } while(0)
 
+#define kjson_push_null(ctn, key) 									\
+	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_NULL, 0, 0);	\
+	
+#define kjson_push_true(ctn, key) do {									\
+	int true = 1;														\
+	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_BOOL, &true, 0);	\
+} while(0)
+
+#define kjson_push_false(ctn, key) do {									\
+	int false = 0;														\
+	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_BOOL, &false, 0);	\
+} while(0)
 /* ****** utility read functions ****** */
 
 /*
@@ -245,6 +259,16 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
  * Get the lenght of an array.
  */
 #define kjson_array_length(obj) (size_t)((struct kjson_array_struct*)obj->data)->len
+
+/*
+ * Get bool data as integer
+ */
+#define kjson_as_bool(obj) *((int*)obj->data)
+
+/*
+ * Return true if the JSON object is null
+ */
+#define kjson_object_is_null(obj) (obj->type == KOBJECT_TYPE_OBJECT_NULL)
 
 /*
  * Create a JSON text starting from the internal data structure.

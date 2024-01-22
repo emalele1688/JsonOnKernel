@@ -287,6 +287,11 @@ static inline bool kjstring_iterator_end(struct kjstring_iterator *iterator)
     return iterator->pos == iterator->str->off;
 }
 
+static inline const char *kjstring_iterator_follow(const struct kjstring_iterator *iterator)
+{
+	return &iterator->str->c_str_data[iterator->pos];
+}
+
 /*
  * Iter all the kjstring_t object.
  * @chr: An empty char type where the next value will be stored
