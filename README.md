@@ -16,6 +16,8 @@ You can link the library direclty on you kernel module code, or use the prebuilt
 * Integer array
 * String array
 * Annidate JSON array
+* Null
+* Boolean
 
 ## Building
 
