@@ -24,6 +24,9 @@ int __init test_init(void)
     kjson_push_string(ctn, "SO", a_string);    
     kjson_push_integer_array(ctn, "AnArrayInt", 3, 5, a_int);
     kjson_push_string_array(ctn, "AnArrayString", a_string, "ubuntu", "archlinux", "centos", "debian");
+    kjson_push_null(ctn, "ThisIsNull");
+    kjson_push_true(ctn, "ThisIsTrue");
+    kjson_push_false(ctn, "ThisIsFalse");
 
    	// Create annidate json array
     struct kjson_container *ctn1 = kjson_new_container();

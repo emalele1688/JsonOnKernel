@@ -8,7 +8,7 @@ int __init test_init(void)
 	struct kjson_object_t *obj;
 
 	// Passed ------------------------------------------------------------------------------------------------------------------------------------------------------
-	char *test_ok_01 = "{ \"value\": 2, \"string\": \"aString\", \"value1\": 20344, \"string1\": \"The String\" }";
+	char *test_ok_01 = "{ \"value\": 2, \"string\": \"aString\", \"value1\": 20344, \"string1\": \"The String\", \"IsNull\": null, \"isTrue\": true, \"isFalse\": false }";
 
 	if((ctn = kjson_parse(test_ok_01)) == NULL)
 		pr_info("WARNING: test_ok_01 not passed\n");
