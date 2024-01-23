@@ -163,8 +163,14 @@ All the integer are int64_t.
 String objects are dinamically allocated.
 All the integer and string objects are deeply copied into the kjson structure.
 
-You can create nested json; First declare and write all annidate json's you 
-need, for example:
+Null object:
+        kjson_push_null(json_a, key)
+
+Boolean:
+        kjson_push_true(json_a, key)
+        kjson_push_false(json_a, key);
+
+Nested json: First declare and write all annidate json's you need, for example:
 
 .. code:: c
 	
@@ -233,6 +239,10 @@ Dependig of the type of the object, you can use:
 	char** str = kjson_as_string_array(obj)	
 	
 	struct kjson_container** c = kjson_as_container_array(obj)
+
+        int bool = kjson_as_bool(obj)
+
+        int isNull = kjson_object_is_null(obj)
 	
 To know the lenght of an array object you can use:
 
