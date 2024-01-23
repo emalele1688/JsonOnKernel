@@ -209,16 +209,16 @@ extern void kjson_delete_object(struct kjson_object_t *obj);
     kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_ARRAY, arr, sizeof(arr) / sizeof(struct kjson_container*));     \
 } while(0)
 
-#define kjson_push_null(ctn, key) 									\
+#define kjson_push_null(ctn, key)					\
 	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_NULL, 0, 0);	\
 	
-#define kjson_push_true(ctn, key) do {									\
-	int true = 1;														\
+#define kjson_push_true(ctn, key) do {						\
+	int true = 1;								\
 	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_BOOL, &true, 0);	\
 } while(0)
 
-#define kjson_push_false(ctn, key) do {									\
-	int false = 0;														\
+#define kjson_push_false(ctn, key) do {						\
+	int false = 0;								\
 	kjson_push_object(ctn, key, KOBJECT_TYPE_OBJECT_BOOL, &false, 0);	\
 } while(0)
 /* ****** utility read functions ****** */
