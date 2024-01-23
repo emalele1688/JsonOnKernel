@@ -89,7 +89,7 @@ int parse_integer(struct kjstring_iterator *iterator, int64_t *ret_value)
     kjstring_static_declare(string_integer, 64);
 
     if(!ret_value)
-        return 1;
+    	return 1;
 
     get_nospace(iterator, nextchar);
     if(nextchar < 0x30 || nextchar > 0x39)
@@ -130,9 +130,8 @@ int parse_integer(struct kjstring_iterator *iterator, int64_t *ret_value)
 int parse_string(struct kjstring_iterator *iterator, struct kjstring_t *ret_str)
 {
     char nextchar;
-//printf("Str\n");
-    pop_nospace(iterator, nextchar);
-    // printk("nextchar %c\n", nextchar);
+
+    pop_nospace(iterator, nextchar);    
     if(nextchar != '\"') {
 	    set_error("Character not recognized - do you miss '\"' ?", iterator->pos, nextchar);
         return 1;
@@ -148,7 +147,7 @@ int parse_string(struct kjstring_iterator *iterator, struct kjstring_t *ret_str)
     if(nextchar == '\0')
     {
 	    set_error("Syntax error", iterator->pos, nextchar);
-        return 1;
+    	return 1;
     }
 
     return 0;
@@ -213,7 +212,7 @@ struct kjson_object_t *parse_string_object(struct kjstring_iterator *iterator)
     size_t obj_size;
 
     if(!iterator)
-        return NULL;
+    	return NULL;
 
     obj_size = find_string_size(iterator) + 1;
     if(kj_alloc(obj, obj_size) == NULL)
@@ -241,7 +240,7 @@ struct kjson_object_t *parse_ctn_object(struct kjstring_iterator *iterator)
     struct kjson_container *nest;
 
     if((nest = kjson_start_parser(iterator, true)) == NULL)
-        return NULL;
+    	return NULL;
 
     if(kj_alloc(obj, sizeof(struct kjson_container*)) == NULL)
     {
@@ -261,7 +260,7 @@ struct kjson_object_t *parse_array_object(struct kjstring_iterator *iterator)
     char nextchar;
 
     if(!iterator)
-        return NULL;
+    	return NULL;
 
     pop_nospace(iterator, nextchar);
     if(nextchar != '[')
@@ -318,7 +317,7 @@ size_t find_array_size(struct kjstring_iterator *iterator)
     {
         pop_nospace(&itra, nextchar);
         if(nextchar == ',')
-            array_size++;
+        	array_size++;
     }
     while(nextchar != ']' && nextchar != '\0');
 
@@ -347,9 +346,9 @@ size_t find_ctn_array_size(struct kjstring_iterator *iterator)
         {
             pop_nospace(&itra, nextchar);
             if(nextchar == ',')
-                array_size++;
+            	array_size++;
             else
-                break;
+            	break;
         }
     }
     while(nextchar != '\0');
