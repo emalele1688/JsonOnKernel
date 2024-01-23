@@ -361,7 +361,7 @@ int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_o
 
     if(unlikely(!data && type != KOBJECT_TYPE_OBJECT_NULL))
         return -EINVAL;
-        
+
     if((int)type > KOBJECT_NUM - 1 || (int)type < 0)
         return -EINVAL;
 
@@ -483,11 +483,11 @@ void __kjson_dump_null(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
 void __kjson_dump_bool(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
 {
     set_key(json_dmp, obj->key);
-    
+
     if(kjson_as_bool(obj))
-   		kjstring_append(json_dmp, "true");
-   	else
-	   	kjstring_append(json_dmp, "false");
+		kjstring_append(json_dmp, "true");
+	else
+		kjstring_append(json_dmp, "false");
 }
 
 int kjson_dump_object(struct kjson_object_t *obj, struct kjstring_t *json_dmp)

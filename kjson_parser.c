@@ -544,21 +544,20 @@ OUT:
 struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator)
 {
 	struct kjson_object_t *obj = NULL;
-	char nextchar;
-	
-	if(!iterator || !iterator->str)
-    	return NULL;
 
-    const char *next_str = kjstring_iterator_follow(iterator);
+	if(!iterator || !iterator->str)
+		return NULL;
+
+	const char *next_str = kjstring_iterator_follow(iterator);
 
 	if(!strncmp(next_str, "null", 4) || !strncmp(next_str, "NULL", 4))
 	{
 		if(kj_alloc(obj, 0) == NULL)
-		    return NULL;
+			return NULL;
 
 		obj->type = KOBJECT_TYPE_OBJECT_NULL;
 		
-	    iterator->pos += 4;
+		iterator->pos += 4;
 	}
 	else if(!strncmp(next_str, "true", 4) || !strncmp(next_str, "TRUE", 4))
 	{
@@ -566,19 +565,19 @@ struct kjson_object_t *parse_null_bool_object(struct kjstring_iterator *iterator
 			return NULL;
 
 		obj->type = KOBJECT_TYPE_OBJECT_BOOL;
-	    *(int*)obj->data = 1;
-	    
-	    iterator->pos += 4;
+		*(int*)obj->data = 1;
+
+		iterator->pos += 4;
 	}
 	else if(!strncmp(next_str, "false", 5) || !strncmp(next_str, "FALSE", 5))
 	{
 		if(kj_alloc(obj, sizeof(int)) == NULL)
 			return NULL;
-		    		    printk("c\n");
+
 		obj->type = KOBJECT_TYPE_OBJECT_BOOL;
-	    *(int*)obj->data = 0;
-	    
-	    iterator->pos += 5;
+		*(int*)obj->data = 0;
+
+		iterator->pos += 5;
 	}
 
 	return obj;
