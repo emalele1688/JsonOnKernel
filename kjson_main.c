@@ -357,23 +357,23 @@ int kjson_push_object(struct kjson_container *ctn, const char *key, enum kjson_o
     struct kjson_object_t *obj;
 
     if(unlikely(!ctn || !key))
-        return -EINVAL;
+		return -EINVAL;
 
     if(unlikely(!data && type != KOBJECT_TYPE_OBJECT_NULL))
-        return -EINVAL;
+		return -EINVAL;
 
     if((int)type > KOBJECT_NUM - 1 || (int)type < 0)
-        return -EINVAL;
+		return -EINVAL;
 
     if((obj = kj_create_ops[(int)type - 1](data, data_len)) == NULL)
-        return -EINVAL;
+    	return -EINVAL;
 
     obj->type = type;
     strncpy(obj->key, key, KJSON_KEY_SIZE);
 
     // If an object with same key already exist, return 1
     if(__kjson_push_object(ctn, obj))
-        return 1;
+    	return 1;
 
     return 0;
 }
@@ -493,10 +493,10 @@ void __kjson_dump_bool(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
 int kjson_dump_object(struct kjson_object_t *obj, struct kjstring_t *json_dmp)
 {
     if(unlikely(!obj || !json_dmp))
-        return -EINVAL;
+    	return -EINVAL;
 
     if(obj->type == 0)
-        return -EINVAL;
+    	return -EINVAL;
 
     kjson_dump_ops[obj->type - 1](obj, json_dmp);
 
@@ -515,10 +515,10 @@ int kjson_dump_process_container(struct kjson_container *ctn, struct kjstring_t 
     hash_for_each_safe(ctn->obj_table_root, i, tmp, curr, obj_list)
     {
         if(j > 0)
-            kjstring_append(json_dmp, ", ");
+        	kjstring_append(json_dmp, ", ");
 
         if((ret = kjson_dump_object(curr, json_dmp)))
-            return ret; // PARSING ERROR
+        	return ret; // PARSING ERROR
 
         j = 1;
     }
@@ -534,15 +534,15 @@ struct kjstring_t *kjson_dump(struct kjson_container *ctn)
     int ret;
 
     if(unlikely(!ctn))
-        return ERR_PTR(-EINVAL);
+    	return ERR_PTR(-EINVAL);
 
     if((json_dmp = kjstring_alloc(KJSON_MEMORY_DUMP_SIZE)) == NULL)
-        return ERR_PTR(-ENOMEM);
+    	return ERR_PTR(-ENOMEM);
 
     if((ret = kjson_dump_process_container(ctn, json_dmp)))
     {
-        kjstring_free(json_dmp);
-        json_dmp = ERR_PTR(ret);
+    	kjstring_free(json_dmp);
+    	json_dmp = ERR_PTR(ret);
     }
 
     return json_dmp;
@@ -551,4 +551,3 @@ EXPORT_SYMBOL_GPL(kjson_dump);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Emanuele Santini <emanuele.santini.88@gmail.com>");
-
